@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,8 +18,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -72,6 +77,21 @@ fun LoginScreen(navController: NavController) {
             ) {
                 Text("Login")
             }
+
+            // Text for redirecting to Signup page
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
+                        append("Sign Up")
+                    }
+                },
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .clickable {
+                        // Navigate to the login screen
+                        navController.navigate("signup")
+                    }
+            )
         }
     }
 }

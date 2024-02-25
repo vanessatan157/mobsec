@@ -15,13 +15,18 @@ class MainActivity : ComponentActivity() {
             MyApplicationTheme {
                 val navController = rememberNavController()
 
-                // Set up the NavHost with LoginScreen and MainScreen
+                // Set up the NavHost with LoginScreen and SignupScreen
                 NavHost(navController = navController, startDestination = "login") {
                     composable("login") {
                         LoginScreen(navController)
+                    }
+                    composable("signup") {
+                        SignupScreen(navController)
                     }
                 }
             }
         }
     }
 }
+
+
