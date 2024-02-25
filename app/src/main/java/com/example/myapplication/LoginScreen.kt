@@ -1,5 +1,7 @@
 package com.example.myapplication
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,11 +32,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun LoginScreen(navController: NavController) {
-    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var showToast by remember { mutableStateOf(false) }
+    var toastMessage by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
+    val auth = FirebaseAuth.getInstance()
 
     Surface(
         modifier = Modifier
@@ -49,13 +58,13 @@ fun LoginScreen(navController: NavController) {
         ) {
             // Add your login screen UI components here
             TextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") },
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text)
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email)
             )
 
             TextField(
@@ -71,12 +80,38 @@ fun LoginScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    // For simplicity, let's just navigate to another screen without any login logic
-                    navController.navigate("main")
+                    // Firebase authentication logic
+                    auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d("LoginScreen", "signInWithEmail:success")
+                                // If login is successful, navigate to the home screen
+                                navController.navigate("home")
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w("LoginScreen", "signInWithEmail:failure", task.exception)
+                                showToast = true
+                                toastMessage = "Authentication failed."
+                            }
+                        }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Login")
+            }
+
+            // Display Toast message when showToast is true
+            if (showToast) {
+                Toast.makeText(
+                    context,
+                    toastMessage,
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                // Reset the values to avoid showing the Toast repeatedly
+                showToast = false
+                toastMessage = ""
             }
 
             // Text for redirecting to Signup page
@@ -89,7 +124,7 @@ fun LoginScreen(navController: NavController) {
                 modifier = Modifier
                     .padding(top = 16.dp)
                     .clickable {
-                        // Navigate to the login screen
+                        // Navigate to the signup screen
                         navController.navigate("signup")
                     }
                     .fillMaxWidth(), // Fill the width of the parent
@@ -107,4 +142,3 @@ fun LoginScreenPreview() {
     val dummyNavController = rememberNavController()
     LoginScreen(dummyNavController)
 }
-
