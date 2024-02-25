@@ -22,6 +22,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -91,6 +92,9 @@ fun LoginScreen(navController: NavController) {
                         // Navigate to the login screen
                         navController.navigate("signup")
                     }
+                    .fillMaxWidth(), // Fill the width of the parent
+                // Center the text horizontally and vertically
+                textAlign = TextAlign.Center
             )
         }
     }
