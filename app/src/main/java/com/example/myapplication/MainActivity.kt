@@ -23,6 +23,9 @@ class MainActivity : ComponentActivity() {
                     composable("signup") {
                         SignupScreen(navController)
                     }
+                    composable("home") {
+                        HomeScreen(navController)
+                    }
                 }
             }
         }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "328671447370",
+    "project_id": "mobilesecuritylogin",
+    "storage_bucket": "mobilesecuritylogin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328671447370:android:7a91deead7852ad75a59b3",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKwgLl-HgHj-caopOV60S1-lZowkHywMU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
