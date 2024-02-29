@@ -1,0 +1,16 @@
+<!-- res/layout/activity_contact_log.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- RecyclerView for displaying contact log items -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewContactLog"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <!-- Add a button or other UI elements for adding new contacts if needed -->
+
+</LinearLayout>
