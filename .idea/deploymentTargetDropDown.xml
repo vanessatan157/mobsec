@@ -3,6 +3,12 @@
   <component name="deploymentTargetDropDown">
     <value>
       <entry key="PreviewMyApp">
+<<<<<<< Updated upstream
+=======
+        <State />
+      </entry>
+      <entry key="PreviewMyApp (1)">
+>>>>>>> Stashed changes
         <State />
       </entry>
       <entry key="app">
