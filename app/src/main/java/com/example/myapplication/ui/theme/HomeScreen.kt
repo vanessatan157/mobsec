@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -37,6 +39,9 @@ fun HomeScreen(navController: NavController) {
             // Add your home screen UI components here
             Text("Welcome to Home Screen!")
 
+            // Button to navigate to user profile
+            ProfileButton(navController)
+
             // Logout button in the top right corner
             IconButton(
                 onClick = {
@@ -50,6 +55,20 @@ fun HomeScreen(navController: NavController) {
                 Icon(imageVector = Icons.Default.ExitToApp, contentDescription = "Logout")
             }
         }
+    }
+}
+
+@Composable
+fun ProfileButton(navController: NavController) {
+    Button(
+        onClick = {
+            // Navigate to the user profile screen
+            navController.navigate("userProfile")
+        },
+        modifier = Modifier
+            .padding(8.dp)
+    ) {
+        Text("User Profile")
     }
 }
 

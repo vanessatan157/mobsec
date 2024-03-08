@@ -1,3 +1,4 @@
+/*
 package com.example.myapplication
 
 import android.widget.Toast
@@ -196,4 +197,4 @@ fun UserProfileScreenPreview() {
     // For the preview, you can pass a dummy NavController
     val dummyNavController = rememberNavController()
     UserProfileScreen(dummyNavController)
-}
+}*/
