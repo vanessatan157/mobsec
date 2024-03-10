@@ -1,0 +1,28 @@
+<?xml version ="1.0" encoding ="utf-8"?><!--  Learn More about how to use App Actions: https://developer.android.com/guide/actions/index.html -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/baseline_home_24"
+        android:title="@string/navigation_home" />
+
+    <item
+        android:id="@+id/nav_report"
+        android:icon="@drawable/baseline_event_note_24"
+        android:title="@string/report" />
+
+    <item
+        android:id="@+id/nav_addBooking"
+        android:icon="@drawable/baseline_event_note_24"
+        android:title="@string/addBooking" />
+
+    <item
+        android:id="@+id/nav_notification"
+        android:icon="@drawable/baseline_event_note_24"
+        android:title="@string/notifications" />
+
+    <item
+        android:id="@+id/nav_account"
+        android:icon="@drawable/baseline_event_note_24"
+        android:title="@string/account" />
+
+</menu>
