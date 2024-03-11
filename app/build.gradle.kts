@@ -74,6 +74,7 @@ dependencies {
     implementation("androidx.compose.material3:material3:")
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
+    implementation("com.google.firebase:firebase-database:20.3.1")
     implementation ("com.google.firebase:firebase-firestore:24.10.3")
     implementation("androidx.appcompat:appcompat:1.6.1")
 
