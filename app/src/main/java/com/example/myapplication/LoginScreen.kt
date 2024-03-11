@@ -89,10 +89,18 @@ fun LoginScreen(navController: NavController) {
                                 // If login is successful, navigate to the home screen
                                 navController.navigate("home")
                             } else {
-                                // If sign in fails, display a message to the user.
-                                Log.w("LoginScreen", "signInWithEmail:failure", task.exception)
-                                showToast = true
-                                toastMessage = "Authentication failed."
+                                // If sign in fails, check for admin credentials
+                                if (email == "admin123@gmail.com" && password == "admin123") {
+                                    // Admin login successful
+                                    Log.d("LoginScreen", "Admin login successful")
+                                    // Navigate to the admin home screen
+                                    navController.navigate("admin_home")
+                                } else {
+                                    // Display a message to the user for other authentication failures
+                                    Log.w("LoginScreen", "Authentication failed.", task.exception)
+                                    showToast = true
+                                    toastMessage = "Authentication failed."
+                                }
                             }
                         }
                 },
