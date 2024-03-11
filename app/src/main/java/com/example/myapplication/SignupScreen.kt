@@ -38,7 +38,7 @@ import androidx.core.util.PatternsCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
-
+import com.google.firebase.firestore.FirebaseFirestore
 @Composable
 fun SignupScreen(navController: NavController) {
     var username by remember { mutableStateOf("") }
@@ -103,7 +103,7 @@ fun SignupScreen(navController: NavController) {
                 onClick = {
                     if (isValidInput(username, email, password)) {
                         // For simplicity, let's just navigate to another screen without any signup logic
-                        signUp(email, password) { success, message ->
+                        signUp(username, email, password) { success, message ->
                             if (success) {
                                 navController.navigate("login")
                             } else {
@@ -134,7 +134,7 @@ fun SignupScreen(navController: NavController) {
                 toastMessage = ""
             }
 
-            // Text for redirecting to login page
+            // Text for redirecting to the login page
             Text(
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
@@ -152,7 +152,6 @@ fun SignupScreen(navController: NavController) {
     }
 }
 
-@Preview(showBackground = true)
 @Composable
 fun SignupScreenPreview() {
     // For the preview, you can pass a dummy NavController
@@ -164,13 +163,32 @@ fun isValidInput(username: String, email: String, password: String): Boolean {
     return !username.isBlank() && PatternsCompat.EMAIL_ADDRESS.matcher(email).matches() && password.length >= 6
 }
 
-fun signUp(email: String, password: String, onComplete: (Boolean, String) -> Unit) {
+fun signUp(username: String, email: String, password: String, onComplete: (Boolean, String) -> Unit) {
     val auth = FirebaseAuth.getInstance()
+
     try {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    onComplete(true, "Sign up successful")
+                    val userId = auth.currentUser?.uid
+                    userId?.let {
+                        val userMap = mapOf(
+                            "username" to username,
+                            "email" to email,
+                            "admin" to false  // Set admin status initially to false
+                        )
+
+                        // Use the Firestore instance directly
+                        FirebaseFirestore.getInstance().collection("users").document(userId).set(userMap)
+                            .addOnSuccessListener {
+                                onComplete(true, "Sign up successful")
+                            }
+                            .addOnFailureListener { e ->
+                                onComplete(false, "Error writing user data to Firestore: ${e.message}")
+                            }
+                    } ?: run {
+                        onComplete(false, "User ID is null")
+                    }
                 } else {
                     val exception = task.exception
                     val message = exception?.localizedMessage ?: "Sign up failed"
