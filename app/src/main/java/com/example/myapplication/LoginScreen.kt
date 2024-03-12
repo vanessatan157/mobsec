@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -84,23 +85,17 @@ fun LoginScreen(navController: NavController) {
                     auth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                // Sign in success, update UI with the signed-in user's information
-                                Log.d("LoginScreen", "signInWithEmail:success")
-                                // If login is successful, navigate to the home screen
-                                navController.navigate("home")
-                            } else {
-                                // Check for admin credentials
-                                if (email == "admin123@gmail.com" && password == "admin123") {
-                                    // Admin login successful
-                                    Log.d("LoginScreen", "Admin login successful")
-                                    // Navigate to the admin home screen
-                                    navController.navigate("home")
-                                } else {
-                                    // Display a message to the user for other authentication failures
-                                    Log.w("LoginScreen", "Authentication failed.", task.exception)
-                                    showToast = true
-                                    toastMessage = "Authentication failed."
+                                // Sign in success, check admin status from Firestore
+                                checkAdminStatus(email, navController) { showToastValue, toastMessageValue ->
+                                    showToast = showToastValue
+                                    toastMessage = toastMessageValue
                                 }
+
+                            } else {
+                                // Display a message to the user for authentication failures
+                                Log.w("LoginScreen", "Authentication failed.", task.exception)
+                                showToast = true
+                                toastMessage = "Authentication failed."
                             }
                         }
                 },
@@ -108,9 +103,6 @@ fun LoginScreen(navController: NavController) {
             ) {
                 Text("Login")
             }
-
-
-
 
             // Display Toast message when showToast is true
             if (showToast) {
@@ -145,6 +137,42 @@ fun LoginScreen(navController: NavController) {
         }
     }
 }
+
+// Check admin status from Firestore
+// Check admin status from Firestore
+fun checkAdminStatus(
+    email: String,
+    navController: NavController,
+    showToast: (Boolean, String) -> Unit // Function to show toast
+) {
+    val usersCollection = FirebaseFirestore.getInstance().collection("users")
+
+    usersCollection
+        .whereEqualTo("email", email)
+        .get()
+        .addOnSuccessListener { documents ->
+            if (!documents.isEmpty) {
+                val isAdmin = documents.documents[0].getBoolean("admin") ?: false
+
+                if (isAdmin) {
+                    Log.d("LoginScreen", "Admin login successful")
+                    navController.navigate("admin")
+                } else {
+                    Log.d("LoginScreen", "User login successful")
+                    navController.navigate("home")
+                }
+            } else {
+                Log.w("LoginScreen", "No user found with email: $email")
+                showToast(true, "Authentication failed.") // Call the showToast function
+            }
+        }
+        .addOnFailureListener { exception ->
+            Log.w("LoginScreen", "Error getting documents: ", exception)
+            showToast(true, "Authentication failed.") // Call the showToast function
+        }
+}
+
+
 
 @Preview(showBackground = true)
 @Composable
