@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +46,9 @@ fun SignupScreen(navController: NavController) {
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
+    var gender by remember { mutableStateOf("") }
+    var mobileNumber by remember { mutableStateOf("") }
     var showToast by remember { mutableStateOf(false) }
     var toastMessage by remember { mutableStateOf("") }
 
@@ -98,12 +103,42 @@ fun SignupScreen(navController: NavController) {
                 visualTransformation = PasswordVisualTransformation(),
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) }
             )
+            // Add new fields for age, gender, and mobile number
+            TextField(
+                value = age,
+                onValueChange = { age = it },
+                label = { Text("Age") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                leadingIcon = { Icon(Icons.Default.DateRange, contentDescription = null) } // Date Range icon for age
+            )
+
+            TextField(
+                value = gender,
+                onValueChange = { gender = it },
+                label = { Text("Gender") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) } // Person icon for gender
+            )
+
+            TextField(
+                value = mobileNumber,
+                onValueChange = { mobileNumber = it },
+                label = { Text("Mobile Number") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) } // Phone icon for mobile number
+            )
 
             Button(
                 onClick = {
-                    if (isValidInput(username, email, password)) {
+                    if (isValidInput(username, email, password, age, gender, mobileNumber)) {
                         // For simplicity, let's just navigate to another screen without any signup logic
-                        signUp(username, email, password) { success, message ->
+                        signUp(username, email, password, age, gender, mobileNumber) { success, message ->
                             if (success) {
                                 navController.navigate("login")
                             } else {
@@ -159,11 +194,17 @@ fun SignupScreenPreview() {
     SignupScreen(dummyNavController)
 }
 
-fun isValidInput(username: String, email: String, password: String): Boolean {
-    return !username.isBlank() && PatternsCompat.EMAIL_ADDRESS.matcher(email).matches() && password.length >= 6
+fun isValidInput(username: String, email: String, password: String, age: String, gender: String, mobileNumber: String): Boolean {
+    // Validate all input fields
+    return !username.isBlank() &&
+            PatternsCompat.EMAIL_ADDRESS.matcher(email).matches() &&
+            password.length >= 6 &&
+            age.isNotBlank() && age.toIntOrNull() != null && age.toInt() > 0 && age.toInt() < 150 &&
+            gender.isNotBlank() &&
+            mobileNumber.isNotBlank() && mobileNumber.length == 8 && mobileNumber.toIntOrNull() != null
 }
 
-fun signUp(username: String, email: String, password: String, onComplete: (Boolean, String) -> Unit) {
+fun signUp(username: String, email: String, password: String, age: String, gender: String, mobileNumber: String, onComplete: (Boolean, String) -> Unit) {
     val auth = FirebaseAuth.getInstance()
 
     try {
@@ -175,7 +216,10 @@ fun signUp(username: String, email: String, password: String, onComplete: (Boole
                         val userMap = mapOf(
                             "username" to username,
                             "email" to email,
-                            "admin" to false  // Set admin status initially to false
+                            "admin" to false, // Set admin status initially to false
+                            "age" to age,
+                            "gender" to gender,
+                            "mobileNumber" to mobileNumber
                         )
 
                         // Use the Firestore instance directly
