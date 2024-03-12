@@ -36,6 +36,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import androidx.core.util.PatternsCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -199,9 +200,9 @@ fun isValidInput(username: String, email: String, password: String, age: String,
     return !username.isBlank() &&
             PatternsCompat.EMAIL_ADDRESS.matcher(email).matches() &&
             password.length >= 6 &&
-            age.isNotBlank() && age.toIntOrNull() != null && age.toInt() > 0 && age.toInt() < 150 &&
-            gender.isNotBlank() &&
-            mobileNumber.isNotBlank() && mobileNumber.length == 8 && mobileNumber.toIntOrNull() != null
+            age.isNotBlank() && age.toIntOrNull() in 0..150 &&
+            (gender.equals("Male", ignoreCase = true) || gender.equals("Female", ignoreCase = true)) &&
+            mobileNumber.isNotBlank() && mobileNumber.length == 8 && mobileNumber.isDigitsOnly()
 }
 
 fun signUp(username: String, email: String, password: String, age: String, gender: String, mobileNumber: String, onComplete: (Boolean, String) -> Unit) {
