@@ -28,6 +28,9 @@ class MainActivity : ComponentActivity() {
                     composable("home") {
                         HomeScreen(navController)
                     }
+                    composable("admin") {
+                        AdminScreen(navController)
+                    }
                 }
             }
         }
