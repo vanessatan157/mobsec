@@ -25,11 +25,42 @@ class MainActivity : ComponentActivity() {
                     composable("signup") {
                         SignupScreen(navController)
                     }
+                    composable("profile") {
+                        ProfileScreen(navController)
+                    }
+                    composable("edit_profile") {
+                        EditProfileScreen(navController)
+                    }
                     composable("home") {
                         HomeScreen(navController)
                     }
                     composable("admin") {
                         AdminScreen(navController)
+                    }
+                    composable("edit_username") {
+                        // Replace EditUsernameScreen with the actual implementation
+                        // You can use a lambda to pass initial data if needed
+                        EditUsernameScreen(navController, initialUsername = "")
+                    }
+                    composable("edit_email") {
+                        // Replace EditEmailScreen with the actual implementation
+                        // You can use a lambda to pass initial data if needed
+                        EditEmailScreen(navController, initialEmail = "")
+                    }
+                    composable("edit_mobile") {
+                        // Replace EditMobileScreen with the actual implementation
+                        // You can use a lambda to pass initial data if needed
+                        EditMobileScreen(navController, initialMobile = "")
+                    }
+                    composable("edit_gender") {
+                        // Replace EditGenderScreen with the actual implementation
+                        // You can use a lambda to pass initial data if needed
+                        EditGenderScreen(navController, initialGender = "")
+                    }
+                    composable("edit_age") {
+                        // Replace EditAgeScreen with the actual implementation
+                        // You can use a lambda to pass initial data if needed
+                        EditAgeScreen(navController, initialAge = "")
                     }
                 }
             }

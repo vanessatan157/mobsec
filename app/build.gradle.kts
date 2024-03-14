@@ -72,4 +72,11 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation("androidx.core:core-ktx:1.3.2")
+    implementation("androidx.appcompat:appcompat:1.3.1")
+    implementation("androidx.compose.ui:ui:1.1.0-alpha02")
+    implementation("androidx.compose.material:material:1.1.0-alpha02")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")
+
 }

@@ -159,7 +159,7 @@ fun checkAdminStatus(
                     navController.navigate("admin")
                 } else {
                     Log.d("LoginScreen", "User login successful")
-                    navController.navigate("home")
+                    navController.navigate("profile") // Navigate to the profile screen
                 }
             } else {
                 Log.w("LoginScreen", "No user found with email: $email")
