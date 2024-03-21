@@ -35,26 +35,40 @@ fun EditEmailScreen(navController: NavController, initialEmail: String) {
 
         Button(
             onClick = {
-                // Update email in Firestore
-                val currentUser = FirebaseAuth.getInstance().currentUser
-                val firestore = FirebaseFirestore.getInstance()
-                currentUser?.let { user ->
-                    val updatedUserData = mapOf("email" to emailState.value)
-                    firestore.collection("users").document(user.uid)
-                        .update(updatedUserData)
-                        .addOnSuccessListener {
-                            // Successfully updated data
-                            navController.popBackStack()
-                        }
-                        .addOnFailureListener { e ->
-                            // Handle failure
-                            e.printStackTrace()
-                        }
+                // Update email in Firestore only if the new email is valid
+                if (isEmailValid(emailState.value)) {
+                    updateEmailInFirestore(navController, emailState.value)
+                } else {
+                    // Handle invalid email (e.g., display error message)
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Save")
         }
+    }
+}
+
+private fun isEmailValid(email: String): Boolean {
+    // Implement email validation logic here
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
+
+private fun updateEmailInFirestore(navController: NavController, newEmail: String) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val firestore = FirebaseFirestore.getInstance()
+    currentUser?.let { user ->
+        val updatedUserData = mapOf("email" to newEmail)
+        firestore.collection("users").document(user.uid)
+            .update(updatedUserData)
+            .addOnSuccessListener {
+                // Successfully updated data
+                navController.popBackStack()
+            }
+            .addOnFailureListener { e ->
+                // Handle failure
+                e.printStackTrace()
+                // Display error message to the user
+            }
     }
 }

@@ -61,26 +61,41 @@ fun EditMobileScreen(navController: NavController, initialMobile: String) {
 
         Button(
             onClick = {
-                // Update mobile number in Firestore
-                val currentUser = FirebaseAuth.getInstance().currentUser
-                val firestore = FirebaseFirestore.getInstance()
-                currentUser?.let { user ->
-                    val updatedUserData = mapOf("mobileNumber" to mobileState.value)
-                    firestore.collection("users").document(user.uid)
-                        .update(updatedUserData)
-                        .addOnSuccessListener {
-                            // Successfully updated data
-                            navController.popBackStack()
-                        }
-                        .addOnFailureListener { e ->
-                            // Handle failure
-                            e.printStackTrace()
-                        }
+                // Update mobile number in Firestore only if the new mobile number is valid
+                if (isMobileNumberValid(mobileState.value)) {
+                    updateMobileNumberInFirestore(navController, mobileState.value)
+                } else {
+                    // Handle invalid mobile number (e.g., display error message)
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Save")
         }
+    }
+}
+
+private fun isMobileNumberValid(mobileNumber: String): Boolean {
+    // Implement mobile number validation logic here
+    // Example: Check if the number is numeric and has the expected length
+    return mobileNumber.matches(Regex("\\d{10}")) // Assuming mobile number has 10 digits
+}
+
+private fun updateMobileNumberInFirestore(navController: NavController, newMobileNumber: String) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val firestore = FirebaseFirestore.getInstance()
+    currentUser?.let { user ->
+        val updatedUserData = mapOf("mobileNumber" to newMobileNumber)
+        firestore.collection("users").document(user.uid)
+            .update(updatedUserData)
+            .addOnSuccessListener {
+                // Successfully updated data
+                navController.popBackStack()
+            }
+            .addOnFailureListener { e ->
+                // Handle failure
+                e.printStackTrace()
+                // Display error message to the user
+            }
     }
 }

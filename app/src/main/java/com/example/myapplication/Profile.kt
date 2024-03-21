@@ -39,7 +39,9 @@ fun ProfileScreen(navController: NavController) {
     val userData = remember { mutableMapOf<String, String>() }
 
     LaunchedEffect(currentUser) {
-        fetchUserData(currentUser, firestore, userData)
+        currentUser?.let {
+            fetchUserData(it, firestore, userData)
+        }
     }
 
     Surface(
@@ -94,21 +96,20 @@ fun ProfileDetail(label: String, value: String, onClick: () -> Unit) {
     }
 }
 
-suspend fun fetchUserData(currentUser: FirebaseUser?, firestore: FirebaseFirestore, userData: MutableMap<String, String>) {
-    currentUser?.let { user ->
-        try {
-            val document = firestore.collection("users").document(user.uid).get().await()
-            if (document.exists()) {
-                val data = document.data
-                data?.forEach { (key, value) ->
-                    if (key != "admin") { // Exclude the "admin" field
-                        userData[key ?: ""] = value?.toString() ?: ""
-                    }
+suspend fun fetchUserData(currentUser: FirebaseUser, firestore: FirebaseFirestore, userData: MutableMap<String, String>) {
+    try {
+        val document = firestore.collection("users").document(currentUser.uid).get().await()
+        if (document.exists()) {
+            val data = document.data
+            data?.forEach { (key, value) ->
+                if (key != "admin") { // Exclude the "admin" field
+                    userData[key ?: ""] = value?.toString() ?: ""
                 }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        // Handle exception appropriately (e.g., log it, show error message to user)
     }
 }
 

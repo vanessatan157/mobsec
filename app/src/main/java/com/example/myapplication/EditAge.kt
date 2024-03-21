@@ -60,26 +60,40 @@ fun EditAgeScreen(navController: NavController, initialAge: String) {
 
         Button(
             onClick = {
-                // Update age in Firestore
-                val currentUser = FirebaseAuth.getInstance().currentUser
-                val firestore = FirebaseFirestore.getInstance()
-                currentUser?.let { user ->
-                    val updatedUserData = mapOf("age" to ageState.value)
-                    firestore.collection("users").document(user.uid)
-                        .update(updatedUserData)
-                        .addOnSuccessListener {
-                            // Successfully updated data
-                            navController.popBackStack()
-                        }
-                        .addOnFailureListener { e ->
-                            // Handle failure
-                            e.printStackTrace()
-                        }
+                // Update age in Firestore only if the new age is valid
+                if (isAgeValid(ageState.value)) {
+                    updateAgeInFirestore(navController, ageState.value)
+                } else {
+                    // Handle invalid age (e.g., display error message)
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Save")
         }
+    }
+}
+
+private fun isAgeValid(age: String): Boolean {
+    // Implement validation logic for age (e.g., numeric, within a certain range)
+    return age.toIntOrNull() in 1..150 // Assuming age is between 1 and 150
+}
+
+private fun updateAgeInFirestore(navController: NavController, newAge: String) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val firestore = FirebaseFirestore.getInstance()
+    currentUser?.let { user ->
+        val updatedUserData = mapOf("age" to newAge)
+        firestore.collection("users").document(user.uid)
+            .update(updatedUserData)
+            .addOnSuccessListener {
+                // Successfully updated data
+                navController.popBackStack()
+            }
+            .addOnFailureListener { e ->
+                // Handle failure
+                e.printStackTrace()
+                // Display error message to the user
+            }
     }
 }

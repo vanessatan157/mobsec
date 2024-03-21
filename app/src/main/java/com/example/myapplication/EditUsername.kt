@@ -60,26 +60,40 @@ fun EditUsernameScreen(navController: NavController, initialUsername: String) {
 
         Button(
             onClick = {
-                // Update username in Firestore
-                val currentUser = FirebaseAuth.getInstance().currentUser
-                val firestore = FirebaseFirestore.getInstance()
-                currentUser?.let { user ->
-                    val updatedUserData = mapOf("username" to usernameState.value)
-                    firestore.collection("users").document(user.uid)
-                        .update(updatedUserData)
-                        .addOnSuccessListener {
-                            // Successfully updated data
-                            navController.popBackStack()
-                        }
-                        .addOnFailureListener { e ->
-                            // Handle failure
-                            e.printStackTrace()
-                        }
+                // Update username in Firestore only if the new username is valid
+                if (isUsernameValid(usernameState.value)) {
+                    updateUserUsername(navController, usernameState.value)
+                } else {
+                    // Handle invalid username (e.g., display error message)
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Save")
         }
+    }
+}
+
+private fun isUsernameValid(username: String): Boolean {
+    // Implement validation logic here (e.g., minimum length, allowed characters)
+    return username.isNotBlank() && username.length <= 20
+}
+
+private fun updateUserUsername(navController: NavController, newUsername: String) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val firestore = FirebaseFirestore.getInstance()
+    currentUser?.let { user ->
+        val updatedUserData = mapOf("username" to newUsername)
+        firestore.collection("users").document(user.uid)
+            .update(updatedUserData)
+            .addOnSuccessListener {
+                // Successfully updated data
+                navController.popBackStack()
+            }
+            .addOnFailureListener { e ->
+                // Handle failure
+                e.printStackTrace()
+                // Display error message to the user
+            }
     }
 }

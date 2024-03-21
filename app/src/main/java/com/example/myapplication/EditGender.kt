@@ -60,26 +60,41 @@ fun EditGenderScreen(navController: NavController, initialGender: String) {
 
         Button(
             onClick = {
-                // Update gender in Firestore
-                val currentUser = FirebaseAuth.getInstance().currentUser
-                val firestore = FirebaseFirestore.getInstance()
-                currentUser?.let { user ->
-                    val updatedUserData = mapOf("gender" to genderState.value)
-                    firestore.collection("users").document(user.uid)
-                        .update(updatedUserData)
-                        .addOnSuccessListener {
-                            // Successfully updated data
-                            navController.popBackStack()
-                        }
-                        .addOnFailureListener { e ->
-                            // Handle failure
-                            e.printStackTrace()
-                        }
+                // Update gender in Firestore only if the new gender is valid
+                if (isGenderValid(genderState.value)) {
+                    updateGenderInFirestore(navController, genderState.value)
+                } else {
+                    // Handle invalid gender (e.g., display error message)
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Save")
         }
+    }
+}
+
+private fun isGenderValid(gender: String): Boolean {
+    // Implement basic validation logic for gender (e.g., limit to certain options)
+    // Example: Only allow 'male', 'female', or 'other'
+    return gender.lowercase() in listOf("male", "female", "other")
+}
+
+private fun updateGenderInFirestore(navController: NavController, newGender: String) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val firestore = FirebaseFirestore.getInstance()
+    currentUser?.let { user ->
+        val updatedUserData = mapOf("gender" to newGender)
+        firestore.collection("users").document(user.uid)
+            .update(updatedUserData)
+            .addOnSuccessListener {
+                // Successfully updated data
+                navController.popBackStack()
+            }
+            .addOnFailureListener { e ->
+                // Handle failure
+                e.printStackTrace()
+                // Display error message to the user
+            }
     }
 }
