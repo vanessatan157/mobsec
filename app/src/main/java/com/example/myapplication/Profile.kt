@@ -1,5 +1,10 @@
 package com.example.myapplication
 
+import android.net.Uri
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,18 +36,30 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import androidx.navigation.NavHostController
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import androidx.core.content.ContextCompat
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+
+
 
 @Composable
 fun ProfileScreen(navController: NavController) {
     val currentUser = FirebaseAuth.getInstance().currentUser
     val firestore = FirebaseFirestore.getInstance()
     val userData = remember { mutableMapOf<String, String>() }
+    val context = LocalContext.current
 
     LaunchedEffect(currentUser) {
         currentUser?.let {
             fetchUserData(it, firestore, userData)
         }
     }
+
 
     Surface(
         modifier = Modifier
@@ -56,6 +73,43 @@ fun ProfileScreen(navController: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center
         ) {
+            val imagePickerLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+                uri?.let { uploadImageToStorage(it) }
+            }
+
+            // Function to check and request permissions
+            val requestPermissionLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestPermission()
+            ) { isGranted: Boolean ->
+                if (isGranted) {
+                    // Permission is granted, launch image picker
+                    imagePickerLauncher.launch("image/*")
+                } else {
+                    // Permission is denied, handle accordingly
+                    // For example, show a message to the user
+                    // or provide an alternative action
+                }
+            }
+
+            // Check if permission is granted before launching image picker
+            IconButton(
+                onClick = {
+                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                        // Permission is already granted, launch image picker
+                        imagePickerLauncher.launch("image/*")
+                    } else {
+                        // Permission is not granted, request it
+                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    }
+                },
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AddPhotoAlternate,
+                    contentDescription = "Upload Image"
+                )
+            }
+
             // Add your profile screen UI components here
             Text("Profile")
 
@@ -92,6 +146,36 @@ fun ProfileDetail(label: String, value: String, onClick: () -> Unit) {
                 contentDescription = "Edit",
                 tint = Color.Gray
             )
+        }
+    }
+}
+
+// Function to handle image upload
+fun uploadImageToStorage(imageUri: Uri) {
+    // Get a reference to the Firebase Storage instance
+    val storage = Firebase.storage
+
+    // Create a storage reference to the location where you want to store the image
+    val imagesRef = storage.reference.child("images/${imageUri.lastPathSegment}")
+
+    // Upload the image to Firebase Storage
+    val uploadTask = imagesRef.putFile(imageUri)
+
+    // Listen for the success or failure of the upload task
+    uploadTask.addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            // Image upload successful
+            // You can retrieve the download URL of the uploaded image if needed
+            imagesRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                // Use the downloadUri to access the uploaded image
+                // For example, you can save this URL to Firestore to associate it with the user's profile
+                val imageUrl = downloadUri.toString()
+                // TODO: Save imageUrl to Firestore or perform any other necessary actions
+            }
+        } else {
+            // Handle upload failure
+            val exception = task.exception
+            exception?.printStackTrace()
         }
     }
 }
