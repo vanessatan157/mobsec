@@ -77,37 +77,49 @@ fun ProfileScreen(navController: NavController) {
                 uri?.let { uploadImageToStorage(it) }
             }
 
-            // Function to check and request permissions
-            val requestPermissionLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.RequestPermission()
-            ) { isGranted: Boolean ->
-                if (isGranted) {
-                    // Permission is granted, launch image picker
-                    imagePickerLauncher.launch("image/*")
-                } else {
-                    // Permission is denied, handle accordingly
-                    // For example, show a message to the user
-                    // or provide an alternative action
-                }
-            }
-
-            // Check if permission is granted before launching image picker
             IconButton(
-                onClick = {
-                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                        // Permission is already granted, launch image picker
-                        imagePickerLauncher.launch("image/*")
-                    } else {
-                        // Permission is not granted, request it
-                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    }
-                },
+                onClick = { imagePickerLauncher.launch("image/*") },
                 modifier = Modifier.padding(vertical = 8.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.AddPhotoAlternate,
                     contentDescription = "Upload Image"
                 )
+//            val imagePickerLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+//                uri?.let { uploadImageToStorage(it) }
+//            }
+//
+//            // Function to check and request permissions
+//            val requestPermissionLauncher = rememberLauncherForActivityResult(
+//                contract = ActivityResultContracts.RequestPermission()
+//            ) { isGranted: Boolean ->
+//                if (isGranted) {
+//                    // Permission is granted, launch image picker
+//                    imagePickerLauncher.launch("image/*")
+//                } else {
+//                    // Permission is denied, handle accordingly
+//                    // For example, show a message to the user
+//                    // or provide an alternative action
+//                }
+//            }
+//
+//            // Check if permission is granted before launching image picker
+//            IconButton(
+//                onClick = {
+//                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+//                        // Permission is already granted, launch image picker
+//                        imagePickerLauncher.launch("image/*")
+//                    } else {
+//                        // Permission is not granted, request it
+//                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+//                    }
+//                },
+//                modifier = Modifier.padding(vertical = 8.dp)
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.AddPhotoAlternate,
+//                    contentDescription = "Upload Image"
+//                )
             }
 
             // Add your profile screen UI components here
