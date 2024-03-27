@@ -19,3 +19,25 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep the entry point to your app (e.g., MainActivity)
+-keep class com.example.myapplication.MainActivity
+
+# Keep Firebase classes and methods
+-keep class com.google.firebase.** { *; }
+-keep class com.firebase.** { *; }
+
+# Keep Glide classes and methods if you're using Glide for image loading
+-keep class com.bumptech.glide.** { *; }
+
+# Keep your model classes if you have any
+-keep class com.example.myapplication.model.** { *; }
+
+# Keep any other classes or methods that you want to preserve
+# For example, if you have custom views or utilities
+-keep class com.example.myapplication.views.** { *; }
+
+# Specify any additional libraries or packages that need to be preserved
+-keep class androidx.** { *; }
+
+# Add any other rules specific to your project
