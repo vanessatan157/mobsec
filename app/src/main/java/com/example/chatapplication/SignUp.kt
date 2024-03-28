@@ -1,5 +1,6 @@
 package com.example.chatapplication
 
+
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -39,6 +40,10 @@ class SignUp : ComponentActivity() {
         edtPassword = findViewById(R.id.edt_password)
         btnSignUp = findViewById(R.id.btnSignup)
 
+        // Get a reference to your database with the asia-southeast1 location
+        val database = FirebaseDatabase.getInstance("https://chatapplication-dc8ca-default-rtdb.asia-southeast1.firebasedatabase.app/")
+        mDbRef = database.reference
+
         btnSignUp.setOnClickListener {
             val name= edtName.text.toString()
             val email = edtEmail.text.toString()
@@ -66,7 +71,7 @@ class SignUp : ComponentActivity() {
     }
 
     private fun addUserToDatabase (name: String, email: String, uid: String) {
-        mDbRef = FirebaseDatabase.getInstance().getReference()
+
 
         mDbRef.child("user").child(uid).setValue(User(name,email,uid))
     }

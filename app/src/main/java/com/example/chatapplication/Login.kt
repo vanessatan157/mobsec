@@ -65,7 +65,11 @@ class Login : ComponentActivity() {
                     startActivity(intent)
 
                 } else {
-                    Toast.makeText(this@Login,"User does not exist", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this@Login,"User does not exist", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        baseContext, "Authentication failed.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
     }
