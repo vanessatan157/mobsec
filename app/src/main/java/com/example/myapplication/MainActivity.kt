@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +27,15 @@ class MainActivity : ComponentActivity() {
                 ){
                     val navController = rememberNavController()
 
-                    NavHost(navController = navController, startDestination = "adminHome"){
+                    NavHost(navController = navController, startDestination = "signUp"){
+                        composable("signUp"){
+                            SignupScreen(navController)
+                        }
+
+                        composable("login"){
+                            LoginScreen(navController)
+                        }
+
                         composable("adminHome"){
                             AdminHomePage(navController)
                         }
@@ -43,30 +52,48 @@ class MainActivity : ComponentActivity() {
                             AdminMedicinePrescripPage(navController)
                         }
 
-                        composable("pubHealthProfile"){
-                            PubHealthProfilePage(navController)
+                        composable("pubAppointmentPage"){
+                            PubAppointmentPage(navController)
                         }
 
-                        composable("pubHistoryProfile"){
-                            PubMedicalHistoryPage(navController)
+                        composable("pubHome/{email}"){
+                            backStackEntry ->
+                            val email = backStackEntry.arguments?.getString("email")?:""
+                            PubHomePage(navController, email)
                         }
 
-                        composable("pubMedicineProfile"){
-                            PubMedicinePrescripPage(navController)
+                        composable("pubHealthProfile/{email}"){
+                            backStackEntry ->
+                            val email = backStackEntry.arguments?.getString("email")?:""
+                            PubHealthProfilePage(navController, email)
+                        }
+
+                        composable("pubHistoryProfile/{email}"){
+                            backStackEntry ->
+                            val email = backStackEntry.arguments?.getString("email")?:""
+                            PubMedicalHistoryPage(navController, email)
+                        }
+
+                        composable("pubMedicineProfile/{email}"){
+                            backStackEntry ->
+                            val email = backStackEntry.arguments?.getString("email")?:""
+                            PubMedicinePrescripPage(navController, email)
                         }
                     }
                 }
             }
         }
+
+        FirebaseApp.initializeApp(this)
     }
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun MedicalAppContentPreview() {
-    MyApplicationTheme {
-        val dummyNavController = rememberNavController()
-        AdminHomePage(dummyNavController)
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun MedicalAppContentPreview() {
+//    MyApplicationTheme {
+//        val dummyNavController = rememberNavController()
+//        AdminHomePage(dummyNavController)
+//    }
+//}

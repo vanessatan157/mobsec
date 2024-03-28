@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,9 +28,73 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import android.util.Log
+import androidx.compose.material3.ButtonDefaults
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun AdminMedicinePrescripPage(navController: NavController) {
+    Scaffold(
+        modifier = Modifier
+            .background(Color.Transparent)
+            .fillMaxWidth(),
+        bottomBar = {
+            BottomAppBar(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Transparent)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.back),
+                    contentDescription = "Back",
+                    modifier = Modifier
+                        .clickable { navController.navigate("adminHome") }
+                        .height(50.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .padding(start = 20.dp)
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.home),
+                    contentDescription = "Home",
+                    modifier = Modifier
+                        .clickable {navController.navigate("adminHome") }
+                        .height(50.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .padding(start = 24.dp)
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.add),
+                    contentDescription = "Medical Appointments",
+                    modifier = Modifier
+                        .clickable { }
+                        .height(75.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .padding(start = 24.dp)
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.records),
+                    contentDescription = "Medical History",
+                    modifier = Modifier
+                        .clickable { navController.navigate("adminHealthProfile") }
+                        .height(50.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .padding(start = 10.dp)
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.profile),
+                    contentDescription = "Profile",
+                    modifier = Modifier
+                        .clickable { }
+                        .height(50.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .padding(start = 10.dp)
+                )
+            }
+        }
+    ){
+
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -90,7 +155,7 @@ fun AdminMedicineProfileSection(navController: NavController) {
                 value = medicineName,
                 onValueChange = {medicineName = it},
                 modifier = Modifier
-                    .height(35.dp)
+                    .height(50.dp)
             )
         }
         Row(
@@ -110,7 +175,7 @@ fun AdminMedicineProfileSection(navController: NavController) {
                 value = dosage,
                 onValueChange = {dosage = it},
                 modifier = Modifier
-                    .height(35.dp)
+                    .height(50.dp)
             )
         }
         Row(
@@ -128,70 +193,50 @@ fun AdminMedicineProfileSection(navController: NavController) {
             )
             OutlinedTextField(
                 value = doctorNotes,
-                onValueChange = {doctorNotes = it}
+                onValueChange = {doctorNotes = it},
+                modifier = Modifier
+                    .height(75.dp)
             )
         }
 
+        SubmitButton(
+            medicineName = medicineName,
+            dosage = dosage,
+            doctorNotes = doctorNotes
+        )
     }
-    Scaffold(
+}
+
+data class MedicinePrescripData(val medicineName: String = "", val dosage: String= "", val doctorNotes: String = "")
+
+@Composable
+fun SubmitButton(medicineName: String, dosage: String, doctorNotes: String)
+{
+    val firestore = FirebaseFirestore.getInstance()
+
+    Row(
         modifier = Modifier
-            .background(Color.Transparent)
             .fillMaxWidth(),
-        bottomBar = {
-            BottomAppBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Transparent)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.back),
-                    contentDescription = "Back",
-                    modifier = Modifier
-                        .clickable { navController.navigate("adminHome") }
-                        .height(50.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .padding(start = 10.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.home),
-                    contentDescription = "Home",
-                    modifier = Modifier
-                        .clickable { }
-                        .height(50.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .padding(start = 24.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.add),
-                    contentDescription = "Medical Appointments",
-                    modifier = Modifier
-                        .clickable { }
-                        .height(75.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .padding(start = 24.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.records),
-                    contentDescription = "Medical History",
-                    modifier = Modifier
-                        .clickable { navController.navigate("adminHealthProfile") }
-                        .height(50.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .padding(start = 10.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.profile),
-                    contentDescription = "Profile",
-                    modifier = Modifier
-                        .clickable { }
-                        .height(50.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .padding(start = 10.dp)
-                )
-            }
-        }
+        horizontalArrangement = Arrangement.Center
     ){
+        Button(
+            onClick = {
+                val medicinePrescripData = MedicinePrescripData(medicineName = medicineName, dosage = dosage,
+                    doctorNotes = doctorNotes)
 
+                firestore.collection("healthProfileDatas")
+                    .add(medicinePrescripData)
+                    .addOnSuccessListener { Log.d("Firestore", "Medicine Prescriptions added with ID: ${it.id}") }
+            },
+            modifier = Modifier
+                .height(50.dp)
+                .width(180.dp),
+            colors = ButtonDefaults.buttonColors(Color(android.graphics.Color.parseColor("#04A6FF")))
+        ){
+            Text(
+                text = "Submit",
+                fontSize = 16.sp
+            )
+        }
     }
-
 }

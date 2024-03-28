@@ -30,16 +30,77 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
+import android.util.Log
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun AdminHealthProfilePage(navController: NavController) {
+    Scaffold(
+        modifier = Modifier
+            .background(Color.Transparent)
+            .fillMaxWidth(),
+        bottomBar = {
+            BottomAppBar(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Transparent)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.back),
+                    contentDescription = "Back",
+                    modifier = Modifier
+                        .clickable { navController.navigate("adminHome") }
+                        .height(50.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .padding(start = 20.dp)
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.home),
+                    contentDescription = "Home",
+                    modifier = Modifier
+                        .clickable { navController.navigate("adminHome")}
+                        .height(50.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .padding(start = 24.dp)
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.add),
+                    contentDescription = "Medical Appointments",
+                    modifier = Modifier
+                        .clickable { }
+                        .height(75.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .padding(start = 24.dp)
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.records),
+                    contentDescription = "Medical History",
+                    modifier = Modifier
+                        .clickable { navController.navigate("adminHealthProfile") }
+                        .height(50.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .padding(start = 10.dp)
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.profile),
+                    contentDescription = "Profile",
+                    modifier = Modifier
+                        .clickable { }
+                        .height(50.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .padding(start = 10.dp)
+                )
+            }
+        }
+    ){
+
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         AdminHealthProfileSection(navController)
-        Spacer(modifier = Modifier.height(16.dp))
         AdminMedicalHistoryButton(navController)
     }
 }
@@ -144,34 +205,34 @@ fun AdminHealthProfileSection(navController: NavController) {
                 label = {Text("Weight Value")}
             )
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 32.dp),
-            horizontalArrangement = Arrangement.Center
-        ){
-            Text(
-                text = "BMI",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 23.sp
-                ),
-                modifier = Modifier.padding(end = 10.dp)
-            )
-            LinearProgressIndicator(
-                progress = 0.5f,
-                modifier = Modifier
-                    .height(18.dp)
-                    .width(150.dp)
-                    .padding(end = 10.dp),
-                color = Color(android.graphics.Color.parseColor("#B106A6"))
-            )
-            Text(
-                text = "50%",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 23.sp
-                )
-            )
-        }
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(bottom = 32.dp),
+//            horizontalArrangement = Arrangement.Center
+//        ){
+//            Text(
+//                text = "BMI",
+//                style = MaterialTheme.typography.bodyMedium.copy(
+//                    fontSize = 23.sp
+//                ),
+//                modifier = Modifier.padding(end = 10.dp)
+//            )
+//            LinearProgressIndicator(
+//                progress = 0.5f,
+//                modifier = Modifier
+//                    .height(18.dp)
+//                    .width(150.dp)
+//                    .padding(end = 10.dp),
+//                color = Color(android.graphics.Color.parseColor("#FF8CF6"))
+//            )
+//            Text(
+//                text = "50%",
+//                style = MaterialTheme.typography.bodyMedium.copy(
+//                    fontSize = 23.sp
+//                )
+//            )
+//        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -194,89 +255,66 @@ fun AdminHealthProfileSection(navController: NavController) {
                 Text(
                     text = "Blood Pressure Level:",
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 16.sp
-                    ),
+                        fontSize = 16.sp),
                     modifier = Modifier
                         .padding(end = 10.dp)
                 )
-                Text(
-                    text = "Normal",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 16.sp
-                    )
-                )
+                Text(text = "Normal", style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 16.sp))
             }
         }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            horizontalArrangement = Arrangement.Center
+        ){
+            SubmitButton(name = name, bloodType = bloodType, height = height, weightValue = weightValue,
+                bloodPressureLevel = bloodPressureLevel)
+        }
     }
-    Scaffold(
+}
+
+data class HealthProfileData(val name: String = "", val bloodType: String = "", val height: String = "",
+    val weightValue: String = "", val bloodPressureLevel: String = "")
+
+@Composable
+fun SubmitButton(name: String, bloodType: String, height: String, weightValue: String,
+                 bloodPressureLevel: String
+){
+    val fireStore = FirebaseFirestore.getInstance()
+
+    Row(
         modifier = Modifier
-            .background(Color.Transparent)
-            .fillMaxWidth(),
-        bottomBar = {
-            BottomAppBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Transparent)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.back),
-                    contentDescription = "Back",
-                    modifier = Modifier
-                        .clickable { navController.navigate("adminHome") }
-                        .height(50.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .padding(start = 10.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.home),
-                    contentDescription = "Home",
-                    modifier = Modifier
-                        .clickable { }
-                        .height(50.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .padding(start = 24.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.add),
-                    contentDescription = "Medical Appointments",
-                    modifier = Modifier
-                        .clickable { }
-                        .height(75.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .padding(start = 24.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.records),
-                    contentDescription = "Medical History",
-                    modifier = Modifier
-                        .clickable { navController.navigate("adminHealthProfile") }
-                        .height(50.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .padding(start = 10.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.profile),
-                    contentDescription = "Profile",
-                    modifier = Modifier
-                        .clickable { }
-                        .height(50.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .padding(start = 10.dp)
-                )
-            }
-        }
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        horizontalArrangement = Arrangement.Center
     ){
+        Button(
+            onClick = {
+                val healthProfileData = HealthProfileData(name = name, bloodType = bloodType, height = height,
+                    weightValue = weightValue, bloodPressureLevel = bloodPressureLevel)
 
+                fireStore.collection("healthProfileDatas")
+                    .add(healthProfileData)
+                    .addOnSuccessListener {Log.d("Firestore", "Health profile added with ID: ${it.id}")}
+            },
+            modifier = Modifier
+                .height(45.dp)
+                .width(180.dp),
+            colors = ButtonDefaults.buttonColors(Color(android.graphics.Color.parseColor("#04A6FF")))
+        ){
+            Text(text = "Submit", fontSize = 16.sp)
+        }
     }
-
 }
 
 @Composable
 fun AdminMedicalHistoryButton(navController: NavController) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
         Button(
@@ -286,10 +324,7 @@ fun AdminMedicalHistoryButton(navController: NavController) {
                 .width(180.dp),
                 colors = ButtonDefaults.buttonColors(Color(android.graphics.Color.parseColor("#04A6FF")))
         ) {
-            Text(
-                text = "Medical History",
-                fontSize = 16.sp
-            )
+            Text(text = "Medical History", fontSize = 16.sp)
         }
     }
 }

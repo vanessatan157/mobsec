@@ -22,21 +22,9 @@ import androidx.navigation.NavController
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Alignment
-import android.content.Context
-import android.os.Build
-import androidx.compose.ui.platform.LocalContext
-import android.net.wifi.WifiInfo
-import android.net.wifi.WifiManager
-import android.telephony.TelephonyManager
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
-import java.net.InetAddress
-import java.net.NetworkInterface
-import java.util.*
-import android.util.Log
 
 @Composable
-fun AdminHomePage(navController: NavController) {
+fun PubHomePage(navController: NavController, email: String) {
     Scaffold(
         modifier = Modifier
             .background(Color.Transparent)
@@ -67,9 +55,9 @@ fun AdminHomePage(navController: NavController) {
                 )
                 Image(
                     painter = painterResource(id = R.drawable.records),
-                    contentDescription = "Medical History",
+                    contentDescription = "Health Profile",
                     modifier = Modifier
-                        .clickable { navController.navigate("adminHealthProfile") }
+                        .clickable { navController.navigate("pubHealthProfile/$email") }
                         .height(50.dp)
                         .clip(MaterialTheme.shapes.small)
                         .padding(start = 10.dp)
@@ -94,82 +82,14 @@ fun AdminHomePage(navController: NavController) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        MedicalAppHome(navController)
+        PubMedicalAppHome(navController, email)
         Spacer(modifier = Modifier.height(16.dp))
     }
 
 }
 
-fun getDeviceInfo(context: Context): String{
-    val manufacturer = Build.MANUFACTURER
-    val model = Build.MODEL
-
-//    //Get Phone Number
-//    val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-//    val phoneNumber = telephonyManager.line1Number
-
-    //Get Android Version
-    val androidVersion = Build.VERSION.RELEASE
-
-    //Get IP Address
-    val ipAddress = getIPAddress()
-
-    //Get device's Wi-Fi MAC Address
-    val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-    val wifiInfo: WifiInfo? = wifiManager.connectionInfo
-    val wifiMacAddress = wifiInfo?.macAddress ?: "Unavailable"
-
-    //Get device's build number
-    val buildNumber = Build.ID
-
-    return "Device Information: $manufacturer $model\n" +
-            //"Phone number: $phoneNumber\n" +
-            "Android Version: $androidVersion\n" +
-            "IP Address: $ipAddress\n" +
-            "Wi-Fi MAC Address: $wifiMacAddress\n" +
-            "Build Number: $buildNumber"
-}
-
-fun getIPAddress(): String {
-    try {
-        val interfaces: Enumeration<NetworkInterface> = NetworkInterface.getNetworkInterfaces()
-        while (interfaces.hasMoreElements()) {
-            val networkInterface: NetworkInterface = interfaces.nextElement()
-            val addresses: Enumeration<InetAddress> = networkInterface.getInetAddresses()
-            while (addresses.hasMoreElements()) {
-                val address: InetAddress = addresses.nextElement()
-                if (!address.isLoopbackAddress) {
-                    val ip: String = address.hostAddress
-                    if (ip.contains(":")) {
-                        continue
-                    }
-                    return ip
-                }
-            }
-        }
-    } catch(e:Exception){
-        e.printStackTrace()
-    }
-    return "Unavailable"
-}
-
-private const val TAG = "DeviceInfo"
-
-fun storeInfoToFirestore(deviceInfo: String){
-    val db = Firebase.firestore
-    val deviceInfoMap = hashMapOf(
-        "info" to deviceInfo
-    )
-
-    db.collection("device_info")
-        .add(deviceInfoMap)
-        .addOnSuccessListener { documentReference ->
-            Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-        }
-}
-
 @Composable
-fun MedicalAppHome(navController: NavController){
+fun PubMedicalAppHome(navController: NavController, email: String){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -212,35 +132,26 @@ fun MedicalAppHome(navController: NavController){
                 contentAlignment = Alignment.Center
             ){
                 Text(
-                    text = "Sheila Ng",
+                    text = "5/4/2024 11:00AM",
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 24.sp
+                        fontSize = 20.sp
                     ),
                     modifier = Modifier
-                        .padding(end = 200.dp)
+                        .padding(start = 10.dp)
+                        .padding(end = 165.dp)
                 )
                 Image(
                     painter = painterResource(id = R.drawable.medicine),
                     contentDescription = "Medicine Prescription",
                     modifier = Modifier
                         .clickable {
-                            navController.navigate("adminMedicineProfile")
+                            navController.navigate("pubMedicineProfile/$email")
                         }
                         .height(30.dp)
                         .clip(MaterialTheme.shapes.small)
-                        .padding(start = 200.dp)
+                        .padding(start = 165.dp)
                 )
             }
-            /*Image (
-                painter = painterResource(id = R.drawable.note),
-                contentDescription = "Health Profile",
-                modifier = Modifier
-                    .clickable {
-                        navController.navigate("adminHealthProfile")
-                    }
-                    .height(30.dp)
-                    .clip(MaterialTheme.shapes.medium)
-            )*/
         }
 
         Text(
@@ -269,23 +180,13 @@ fun MedicalAppHome(navController: NavController){
                 contentAlignment = Alignment.Center
             ){
                 Text(
-                    text = "Paul Chua",
+                    text = "10/4/2024 10.30AM",
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 24.sp
+                        fontSize = 20.sp
                     ),
                     modifier = Modifier
-                        .padding(end = 200.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.medicine),
-                    contentDescription = "Medicine Prescription",
-                    modifier = Modifier
-                        .clickable {
-                            navController.navigate("adminMedicineProfile")
-                        }
-                        .height(30.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .padding(start = 200.dp)
+                        .padding(start = 10.dp)
+                        .padding(end = 150.dp)
                 )
             }
         }
@@ -304,25 +205,13 @@ fun MedicalAppHome(navController: NavController){
                 contentAlignment = Alignment.Center
             ){
                 Text(
-                    text = "Shannen Lee",
+                    text = "15/4/2024 11.00AM",
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 24.sp
+                        fontSize = 20.sp
                     ),
                     modifier = Modifier
-                        .padding(end = 175.dp)
-                )
-                val context = LocalContext.current
-                Image(
-                    painter = painterResource(id = R.drawable.medicine),
-                    contentDescription = "Device Information",
-                    modifier = Modifier
-                        .clickable {
-                            val deviceInfo = getDeviceInfo(context)
-                            storeInfoToFirestore(deviceInfo)
-                        }
-                        .height(30.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .padding(start = 200.dp)
+                        .padding(start = 10.dp)
+                        .padding(end = 150.dp)
                 )
             }
         }
