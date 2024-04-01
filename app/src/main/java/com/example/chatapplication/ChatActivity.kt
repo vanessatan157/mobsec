@@ -37,8 +37,7 @@ class ChatActivity : AppCompatActivity() {
     var receiverRoom: String? = null
     var senderRoom: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?)
-    {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
@@ -85,17 +84,18 @@ class ChatActivity : AppCompatActivity() {
 
         // adding the message to database
         sendButton.setOnClickListener {
-
             val message = messageBox.text.toString()
-            val messageObject = Message(message,senderUid)
+            val messageObject = Message(message, senderUid)
 
+            // Push the message to the sender room
             mDbRef.child("chats").child(senderRoom!!).child("messages").push()
-                .setValue(messageObject).addOnSuccessListener {
-                    mDbRef.child("chats").child(receiverRoom!!).child("messages").push()
-                        .setValue(messageObject)
+                .setValue(messageObject)
+                .addOnSuccessListener {
+                    // Clear the message box after sending the message
+                    messageBox.setText("")
                 }
-            messageBox.setText("")
         }
+
     }
 }
 

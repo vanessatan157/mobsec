@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
-class Login : AppCompatActivity() {
+class Login : ComponentActivity() {
 
 
     private lateinit var edtEmail: EditText
@@ -66,7 +66,7 @@ class Login : AppCompatActivity() {
                     startActivity(intent)
 
                 } else {
-                    //Toast.makeText(this@Login,"User does not exist", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@Login,"User does not exist", Toast.LENGTH_SHORT).show()
                     Toast.makeText(
                         baseContext, "Authentication failed.",
                         Toast.LENGTH_SHORT

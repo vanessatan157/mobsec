@@ -46,3 +46,4 @@ class UserAdapter(val context: Context, val userList: ArrayList<User>):
         val textName = itemView.findViewById<TextView>(R.id.txt_name)
     }
 }
+

@@ -44,7 +44,7 @@ class SignUp : AppCompatActivity() {
         btnSignUp = findViewById(R.id.btnSignup)
 
         // Get a reference to your database with the asia-southeast1 location
-        val database = FirebaseDatabase.getInstance("https://mobilesecuritylogin-default-rtdb.firebaseio.com/")
+        val database = FirebaseDatabase.getInstance("https://chatapplication-dc8ca-default-rtdb.asia-southeast1.firebasedatabase.app/")
         mDbRef = database.reference
 
         btnSignUp.setOnClickListener {
