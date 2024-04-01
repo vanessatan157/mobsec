@@ -44,7 +44,6 @@ class ChatActivity : AppCompatActivity() {
 
         val name = intent.getStringExtra("name")
         val receiverUid = intent.getStringExtra("uid")
-
         val senderUid = FirebaseAuth.getInstance().currentUser?.uid
         mDbRef = FirebaseDatabase.getInstance().getReference()
 
@@ -64,24 +63,25 @@ class ChatActivity : AppCompatActivity() {
 
         //logic for adding data to recyclerView
         mDbRef.child("chats").child(senderRoom!!).child("messages")
-            .addValueEventListener(object:ValueEventListener{
+            .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
+                    val newMessageList = mutableListOf<Message>()
+
+                    for (postSnapshot in snapshot.children) {
+                        val message = postSnapshot.getValue(Message::class.java)
+                        message?.let { newMessageList.add(it) }
+                    }
 
                     messageList.clear()
-
-                    for(postSnapshot in snapshot.children) {
-
-                        val message = postSnapshot.getValue(Message::class.java)
-                        messageList.add(message!!)
-                    }
+                    messageList.addAll(newMessageList)
                     messageAdapter.notifyDataSetChanged()
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-
+                    // Handle onCancelled event if needed
                 }
-
             })
+
 
         // adding the message to database
         sendButton.setOnClickListener {

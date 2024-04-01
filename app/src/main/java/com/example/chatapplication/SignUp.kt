@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,7 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
-class SignUp : ComponentActivity() {
+class SignUp : AppCompatActivity() {
 
     private lateinit var edtName: EditText
     private lateinit var edtEmail: EditText
@@ -33,6 +34,8 @@ class SignUp : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
 
+        supportActionBar?.hide()
+
         mAuth = FirebaseAuth.getInstance()
 
         edtName = findViewById(R.id.edt_name)
@@ -41,7 +44,7 @@ class SignUp : ComponentActivity() {
         btnSignUp = findViewById(R.id.btnSignup)
 
         // Get a reference to your database with the asia-southeast1 location
-        val database = FirebaseDatabase.getInstance("https://chatapplication-dc8ca-default-rtdb.asia-southeast1.firebasedatabase.app/")
+        val database = FirebaseDatabase.getInstance("https://mobilesecuritylogin-default-rtdb.firebaseio.com/")
         mDbRef = database.reference
 
         btnSignUp.setOnClickListener {

@@ -1,15 +1,15 @@
 package com.example.chatapplication
 
 class User {
-    var name: String? = null
     var email: String? = null
+    var name: String? = null
     var uid: String? = null
 
     constructor()
 
-    constructor(name:String?, email: String?, uid: String?) {
-        this.name = name
-        this.email = email
+    constructor(email: String, name: String?, uid: String?) {
+        this.email = name
+        this.name = email
         this.uid = uid
     }
 }

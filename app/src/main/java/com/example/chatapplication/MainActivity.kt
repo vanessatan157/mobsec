@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,7 +24,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var userRecyclerView: RecyclerView
     private lateinit var userList: ArrayList<User>
@@ -45,6 +46,12 @@ class MainActivity : ComponentActivity() {
         userRecyclerView.layoutManager = LinearLayoutManager(this)
         userRecyclerView.adapter = adapter
 
+        userList.add(User("Nurse", "nurse123@gmail.com", "ryHQkaal64MbfIZlhRjn8EBB9ka2"))
+        userList.add(User("Patient", "patient123@gmail.com", "wF38LDtSWZdevtmYLWxMV6MKJ8S2"))
+        //userList.add(User("Test", "test123@gmail.com", "G2Sy2Wo4vvR7WzeGXH7tPtTgWcE3"))
+
+
+
         mDbRef.child("user").addValueEventListener(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
 
@@ -52,7 +59,6 @@ class MainActivity : ComponentActivity() {
                 for (postSnapshot in snapshot.children) {
 
                     val currentUser = postSnapshot.getValue(User::class.java)
-
                     if(mAuth.currentUser?.uid != currentUser?.uid) {
                         userList.add(currentUser!!)
                     }
@@ -79,8 +85,8 @@ class MainActivity : ComponentActivity() {
             // login for logout
             mAuth.signOut()
             val intent = Intent(this@MainActivity,Login::class.java)
-
             finish()
+            startActivity(intent)
             return true
         }
         return true
