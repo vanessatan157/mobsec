@@ -37,9 +37,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.material.TextField
 import androidx.compose.material.Button
+import androidx.compose.runtime.MutableState
 
 @Composable
-fun EditAgeScreen(navController: NavController, initialAge: String) {
+fun EditAgeScreen(navController: NavController, initialAge: String, errorMessage: MutableState<String?>) {
     // State for the new age
     val ageState = remember { mutableStateOf(initialAge) }
 
@@ -64,7 +65,8 @@ fun EditAgeScreen(navController: NavController, initialAge: String) {
                 if (isAgeValid(ageState.value)) {
                     updateAgeInFirestore(navController, ageState.value)
                 } else {
-                    // Handle invalid age (e.g., display error message)
+                    // Display an error message if the age is invalid
+                    errorMessage.value = "Invalid age. Please enter a valid age."
                 }
             },
             modifier = Modifier.fillMaxWidth()

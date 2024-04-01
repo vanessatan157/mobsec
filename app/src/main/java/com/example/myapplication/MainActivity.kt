@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.compose.NavHost
@@ -28,6 +30,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 val navController = rememberNavController()
+
+                // Initialize errorMessage state
+                val errorMessage = remember { mutableStateOf<String?>(null)}
 
                 ProvideFirebaseInstances(auth = auth, firestore = firestore) {
                     // Set up the NavHost with LoginScreen and SignupScreen
@@ -73,7 +78,7 @@ class MainActivity : ComponentActivity() {
                         composable("edit_age") {
                             // Replace EditAgeScreen with the actual implementation
                             // You can use a lambda to pass initial data if needed
-                            EditAgeScreen(navController, initialAge = "")
+                            EditAgeScreen(navController, initialAge = "", errorMessage)
                         }
                     }
                 }
