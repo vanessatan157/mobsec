@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.material.TextField
 import androidx.compose.material.Button
@@ -59,18 +60,32 @@ fun EditMobileScreen(navController: NavController, initialMobile: String) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {
-                // Update mobile number in Firestore only if the new mobile number is valid
-                if (isMobileNumberValid(mobileState.value)) {
-                    updateMobileNumberInFirestore(navController, mobileState.value)
-                } else {
-                    // Handle invalid mobile number (e.g., display error message)
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Save")
+            Button(
+                onClick = {
+                    // Update mobile number in Firestore only if the new mobile number is valid
+                    if (isMobileNumberValid(mobileState.value)) {
+                        updateMobileNumberInFirestore(navController, mobileState.value)
+                    } else {
+                        // Handle invalid mobile number (e.g., display error message)
+                    }
+                },
+                modifier = Modifier.weight(1f) // Shortens the button
+            ) {
+                Text("Save")
+            }
+
+            Spacer(modifier = Modifier.width(8.dp)) // Add space between buttons
+
+            Button(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.weight(1f) // Shortens the button
+            ) {
+                Text("Back to Profile")
+            }
         }
     }
 }

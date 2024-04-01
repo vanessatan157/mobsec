@@ -33,18 +33,32 @@ fun EditEmailScreen(navController: NavController, initialEmail: String) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {
-                // Update email in Firestore only if the new email is valid
-                if (isEmailValid(emailState.value)) {
-                    updateEmailInFirestore(navController, emailState.value)
-                } else {
-                    // Handle invalid email (e.g., display error message)
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Save")
+            Button(
+                onClick = {
+                    // Update email in Firestore only if the new email is valid
+                    if (isEmailValid(emailState.value)) {
+                        updateEmailInFirestore(navController, emailState.value)
+                    } else {
+                        // Handle invalid email (e.g., display error message)
+                    }
+                },
+                modifier = Modifier.weight(1f) // Shortens the button
+            ) {
+                Text("Save")
+            }
+
+            Spacer(modifier = Modifier.width(8.dp)) // Add space between buttons
+
+            Button(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.weight(1f) // Shortens the button
+            ) {
+                Text("Back to Profile")
+            }
         }
     }
 }

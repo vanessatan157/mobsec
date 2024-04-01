@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.material.TextField
 import androidx.compose.material.Button
@@ -59,19 +60,33 @@ fun EditAgeScreen(navController: NavController, initialAge: String, errorMessage
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {
-                // Update age in Firestore only if the new age is valid
-                if (isAgeValid(ageState.value)) {
-                    updateAgeInFirestore(navController, ageState.value)
-                } else {
-                    // Display an error message if the age is invalid
-                    errorMessage.value = "Invalid age. Please enter a valid age."
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Save")
+            Button(
+                onClick = {
+                    // Update age in Firestore only if the new age is valid
+                    if (isAgeValid(ageState.value)) {
+                        updateAgeInFirestore(navController, ageState.value)
+                    } else {
+                        // Display an error message if the age is invalid
+                        errorMessage.value = "Invalid age. Please enter a valid age."
+                    }
+                },
+                modifier = Modifier.weight(1f) // Shortens the button
+            ) {
+                Text("Save")
+            }
+
+            Spacer(modifier = Modifier.width(8.dp)) // Add space between buttons
+
+            Button(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.weight(1f) // Shortens the button
+            ) {
+                Text("Back to Profile")
+            }
         }
     }
 }
