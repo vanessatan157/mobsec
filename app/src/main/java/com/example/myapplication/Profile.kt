@@ -52,7 +52,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.layout.ContentScale
 import com.google.firebase.storage.StorageReference
+import coil.compose.rememberImagePainter
+import androidx.compose.foundation.Image
 
 
 @Composable
@@ -141,21 +144,20 @@ fun ProfileScreen(navController: NavController) {
 
 @Composable
 fun ProfilePicture(imageUrl: String) {
-    // You can use any image loading library here (e.g., Coil, Glide)
-    // For simplicity, let's just load the image using the provided URL
-    Surface(
+    // Load the profile picture using Coil's rememberImagePainter
+    val painter = rememberImagePainter(
+        data = imageUrl,
+        builder = {
+            // You can add any necessary transformations here
+        }
+    )
+
+    Image(
+        painter = painter,
+        contentDescription = "Profile Picture",
         modifier = Modifier.size(120.dp),
-        shape = CircleShape,
-        color = Color.Gray
-    ) {
-        // You can replace this with an image loading composable from your preferred library
-        // For example, CoilImage or GlideImage
-        Text(
-            text = "Profile Picture",
-            modifier = Modifier.padding(8.dp),
-            color = Color.White
-        )
-    }
+        contentScale = ContentScale.Crop
+    )
 }
 
 // Function to upload image to Firebase Storage and update user profile
