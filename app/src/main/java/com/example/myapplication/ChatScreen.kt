@@ -28,7 +28,7 @@ fun ChatScreen(navController: NavController) {
     var showToast by remember { mutableStateOf(false) }
     var toastMessage by remember { mutableStateOf("") }
     var messageText by remember { mutableStateOf("") }
-    var chatMessages by remember { mutableStateOf(listOf<String>()) }
+    var chatMessages by remember { mutableStateOf<MutableMap<String, List<String>>>(mutableMapOf()) }
 
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -75,17 +75,15 @@ fun ChatScreen(navController: NavController) {
     // Listen for new messages when a user is selected
     LaunchedEffect(selectedUsername) {
         if (selectedUsername.isNotEmpty()) {
-            // Clear the chatMessages when a new user is selected
-            chatMessages = emptyList()
-
-            listenForMessages(selectedUsername) { message ->
-                // Check if the message is not already present in uniqueMessages
-                if (message !in uniqueMessages) {
-                    chatMessages = chatMessages.toMutableList().apply {
-                        add(message)
+            // If chat history for the selected user is not fetched yet, fetch it
+            if (chatMessages[selectedUsername] == null) {
+                listenForMessages(selectedUsername) { message ->
+                    // Check if the message is not already present in uniqueMessages
+                    if (message !in uniqueMessages) {
+                        chatMessages[selectedUsername] = (chatMessages[selectedUsername] ?: emptyList()) + message
+                        // Add the message to the set of unique messages
+                        uniqueMessages.add(message)
                     }
-                    // Add the message to the set of unique messages
-                    uniqueMessages.add(message)
                 }
             }
         }
@@ -101,8 +99,10 @@ fun ChatScreen(navController: NavController) {
         LazyColumn(
             modifier = Modifier.weight(1f)
         ) {
-            items(chatMessages) { message ->
-                ChatMessage(text = message, isSentByCurrentUser = message.startsWith(userData["username"] ?: ""))
+            chatMessages[selectedUsername]?.let { messages ->
+                items(messages) { message ->
+                    ChatMessage(text = message, isSentByCurrentUser = message.startsWith(userData["username"] ?: ""))
+                }
             }
         }
 
