@@ -23,6 +23,11 @@ import java.util.*
 import com.google.firebase.auth.FirebaseUser
 
 @Composable
+fun MainScreen(navController: NavController) {
+    ChatScreen(navController = navController)
+}
+
+@Composable
 fun ChatScreen(navController: NavController) {
     var selectedUsername by remember { mutableStateOf("") }
     var showToast by remember { mutableStateOf(false) }
@@ -69,21 +74,14 @@ fun ChatScreen(navController: NavController) {
         }
     }
 
-    // Define a set to keep track of unique messages
-    val uniqueMessages = remember { mutableSetOf<String>() }
-
     // Listen for new messages when a user is selected
     LaunchedEffect(selectedUsername) {
         if (selectedUsername.isNotEmpty()) {
             // If chat history for the selected user is not fetched yet, fetch it
             if (chatMessages[selectedUsername] == null) {
                 listenForMessages(selectedUsername) { message ->
-                    // Check if the message is not already present in uniqueMessages
-                    if (message !in uniqueMessages) {
-                        chatMessages[selectedUsername] = (chatMessages[selectedUsername] ?: emptyList()) + message
-                        // Add the message to the set of unique messages
-                        uniqueMessages.add(message)
-                    }
+                    // Update chatMessages state with the new message
+                    chatMessages[selectedUsername] = (chatMessages[selectedUsername] ?: emptyList()) + message
                 }
             }
         }
@@ -122,7 +120,7 @@ fun ChatScreen(navController: NavController) {
                     label = { Text("Type a message...") },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                     keyboardActions = KeyboardActions(onSend = {
-                        sendMessage(selectedUsername, messageText, userData, selectedUsername)
+                        sendMessage(selectedUsername, messageText, userData)
                         messageText = ""
                         keyboardController?.hide()
                     }),
@@ -132,7 +130,7 @@ fun ChatScreen(navController: NavController) {
                 // Send button
                 Button(
                     onClick = {
-                        sendMessage(selectedUsername, messageText, userData, selectedUsername)
+                        sendMessage(selectedUsername, messageText, userData)
                         messageText = ""
                         keyboardController?.hide()
                     },
@@ -166,7 +164,7 @@ fun listenForMessages(selectedUsername: String, onNewMessageReceived: (String) -
         }
 }
 
-fun sendMessage(recipientUsername: String, message: String, userData: Map<String, String>, selectedUsername: String) {
+fun sendMessage(recipientUsername: String, message: String, userData: Map<String, String>) {
     val firestore = FirebaseFirestore.getInstance()
     val chatCollection = firestore.collection("chat")
 
@@ -181,6 +179,9 @@ fun sendMessage(recipientUsername: String, message: String, userData: Map<String
     )
 
     chatCollection.add(messageMap)
+        .addOnSuccessListener {
+            // Message sent successfully
+        }
         .addOnFailureListener { e ->
             // Handle failure
         }
