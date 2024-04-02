@@ -17,6 +17,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 
@@ -55,6 +57,18 @@ fun ChatScreen(navController: NavController) {
             }
     }
 
+    // Fetch the current user's data
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val firestore = FirebaseFirestore.getInstance() // Use FirebaseFirestore.getInstance() directly
+    var userData by remember { mutableStateOf<MutableMap<String, String>>(mutableMapOf()) } // Change the type to MutableMap
+    LaunchedEffect(currentUser) {
+        currentUser?.let {
+            fetchUserData(it, firestore) { fetchedUserData ->
+                userData = fetchedUserData.toMutableMap() // Convert fetched data to mutable map
+            }
+        }
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         // Display the list of usernames
         UserList(userList = userList, selectedUsername = selectedUsername) { username ->
@@ -66,7 +80,7 @@ fun ChatScreen(navController: NavController) {
             modifier = Modifier.weight(1f)
         ) {
             items(chatMessages) { message ->
-                ChatMessage(text = message, isSentByCurrentUser = message.startsWith("current_user_id"))
+                ChatMessage(text = message, isSentByCurrentUser = message.startsWith(userData["username"] ?: ""))
             }
         }
 
@@ -86,7 +100,7 @@ fun ChatScreen(navController: NavController) {
                     label = { Text("Type a message...") },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                     keyboardActions = KeyboardActions(onSend = {
-                        sendMessage(selectedUsername, messageText)
+                        sendMessage(selectedUsername, messageText, userData)
                         messageText = ""
                         keyboardController?.hide()
                     }),
@@ -96,7 +110,7 @@ fun ChatScreen(navController: NavController) {
                 // Send button
                 Button(
                     onClick = {
-                        sendMessage(selectedUsername, messageText)
+                        sendMessage(selectedUsername, messageText, userData)
                         messageText = ""
                         keyboardController?.hide()
                     },
@@ -109,11 +123,15 @@ fun ChatScreen(navController: NavController) {
     }
 }
 
-fun sendMessage(recipientUsername: String, message: String) {
+fun sendMessage(recipientUsername: String, message: String, userData: Map<String, String>) {
     val firestore = FirebaseFirestore.getInstance()
     val chatCollection = firestore.collection("chat")
+
+    // Retrieve the sender's username from userData map
+    val senderUsername = userData["username"] ?: ""
+
     val messageMap = hashMapOf(
-        "sender" to "current_user_id", // Replace with the current user ID
+        "sender" to senderUsername,
         "recipient" to recipientUsername,
         "message" to message,
         "timestamp" to Date().toString()
@@ -161,4 +179,19 @@ fun ChatMessage(text: String, isSentByCurrentUser: Boolean) {
             )
         }
     }
+}
+
+// Define fetchUserData function
+suspend fun fetchUserData(currentUser: FirebaseUser, firestore: FirebaseFirestore, onUserDataFetched: (Map<String, String>) -> Unit) {
+    val userDoc = firestore.collection("users").document(currentUser.uid)
+    userDoc.get()
+        .addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val userData = document.data ?: mapOf()
+                onUserDataFetched(userData as Map<String, String>)
+            }
+        }
+        .addOnFailureListener { e ->
+            // Handle error
+        }
 }
