@@ -18,9 +18,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
+import com.google.firebase.auth.FirebaseUser
 
 @Composable
 fun ChatScreen(navController: NavController) {
@@ -59,12 +59,34 @@ fun ChatScreen(navController: NavController) {
 
     // Fetch the current user's data
     val currentUser = FirebaseAuth.getInstance().currentUser
-    val firestore = FirebaseFirestore.getInstance() // Use FirebaseFirestore.getInstance() directly
-    var userData by remember { mutableStateOf<MutableMap<String, String>>(mutableMapOf()) } // Change the type to MutableMap
+    val firestore = FirebaseFirestore.getInstance()
+    var userData by remember { mutableStateOf<MutableMap<String, String>>(mutableMapOf()) }
     LaunchedEffect(currentUser) {
         currentUser?.let {
             fetchUserData(it, firestore) { fetchedUserData ->
-                userData = fetchedUserData.toMutableMap() // Convert fetched data to mutable map
+                userData = fetchedUserData.toMutableMap()
+            }
+        }
+    }
+
+    // Define a set to keep track of unique messages
+    val uniqueMessages = remember { mutableSetOf<String>() }
+
+    // Listen for new messages when a user is selected
+    LaunchedEffect(selectedUsername) {
+        if (selectedUsername.isNotEmpty()) {
+            // Clear the chatMessages when a new user is selected
+            chatMessages = emptyList()
+
+            listenForMessages(selectedUsername) { message ->
+                // Check if the message is not already present in uniqueMessages
+                if (message !in uniqueMessages) {
+                    chatMessages = chatMessages.toMutableList().apply {
+                        add(message)
+                    }
+                    // Add the message to the set of unique messages
+                    uniqueMessages.add(message)
+                }
             }
         }
     }
@@ -100,7 +122,7 @@ fun ChatScreen(navController: NavController) {
                     label = { Text("Type a message...") },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                     keyboardActions = KeyboardActions(onSend = {
-                        sendMessage(selectedUsername, messageText, userData)
+                        sendMessage(selectedUsername, messageText, userData, selectedUsername)
                         messageText = ""
                         keyboardController?.hide()
                     }),
@@ -110,7 +132,7 @@ fun ChatScreen(navController: NavController) {
                 // Send button
                 Button(
                     onClick = {
-                        sendMessage(selectedUsername, messageText, userData)
+                        sendMessage(selectedUsername, messageText, userData, selectedUsername)
                         messageText = ""
                         keyboardController?.hide()
                     },
@@ -123,7 +145,28 @@ fun ChatScreen(navController: NavController) {
     }
 }
 
-fun sendMessage(recipientUsername: String, message: String, userData: Map<String, String>) {
+fun listenForMessages(selectedUsername: String, onNewMessageReceived: (String) -> Unit) {
+    val firestore = FirebaseFirestore.getInstance()
+    val chatCollection = firestore.collection("chat")
+
+    // Listen for new messages directed to the current user
+    chatCollection
+        .whereEqualTo("recipient", selectedUsername)
+        .addSnapshotListener { snapshot, exception ->
+            if (exception != null) {
+                // Handle exception
+                return@addSnapshotListener
+            }
+
+            snapshot?.documents?.forEach { document ->
+                val sender = document.getString("sender") ?: ""
+                val message = document.getString("message") ?: ""
+                onNewMessageReceived("$sender: $message")
+            }
+        }
+}
+
+fun sendMessage(recipientUsername: String, message: String, userData: Map<String, String>, selectedUsername: String) {
     val firestore = FirebaseFirestore.getInstance()
     val chatCollection = firestore.collection("chat")
 
@@ -136,7 +179,11 @@ fun sendMessage(recipientUsername: String, message: String, userData: Map<String
         "message" to message,
         "timestamp" to Date().toString()
     )
+
     chatCollection.add(messageMap)
+        .addOnFailureListener { e ->
+            // Handle failure
+        }
 }
 
 @Composable
